@@ -23,3 +23,11 @@ push-images: build-images
 clean:
 	docker rmi $(PRODUCER_IMAGE) $(CONSUMER_IMAGE) $(WEBUI_IMAGE)
 	docker rmi $(REGISTRY)/$(PRODUCER_IMAGE) $(REGISTRY)/$(CONSUMER_IMAGE) $(REGISTRY)/$(WEBUI_IMAGE)
+
+
+
+apply-k8s:
+	kubectl apply -f deploy/
+
+delete-k8s:
+	kubectl delete -f deploy/
