@@ -26,15 +26,31 @@ func consumer(ctx context.Context, consumerName string) {
 	})
 
 	for {
-		result, err := client.BRPop(ctx, 0, "queue").Result()
+		// Use BLMOVE to atomically move an item from "queue" to "processing"
+		result, err := client.BLMove(ctx, "queue", "processing", "RIGHT", "LEFT", 0).Result()
 		if err != nil {
-			fmt.Printf("[%s] error popping from queue: %w\n", consumerName, err)
+			fmt.Printf("[%s] error moving from queue to processing: %v\n", consumerName, err)
 			continue
 		}
 
-		fmt.Printf("[%s] received: %v\n", consumerName, result)
+		fmt.Printf("[%s] processing: %v\n", consumerName, result)
 
-		// Wait a random amount of time before popping the next item
+		// Wait a random amount of time before marking the item as done
 		time.Sleep(time.Duration(rand.Intn(5)) * time.Second)
+
+		// Move item from "processing" to "done"
+		_, err = client.LRem(ctx, "processing", 1, result).Result()
+		if err != nil {
+			fmt.Printf("[%s] error removing from processing: %v\n", consumerName, err)
+			continue
+		}
+
+		_, err = client.RPush(ctx, "done", result).Result()
+		if err != nil {
+			fmt.Printf("[%s] error pushing to done: %v\n", consumerName, err)
+			continue
+		}
+
+		fmt.Printf("[%s] moved to done: %v\n", consumerName, result)
 	}
 }

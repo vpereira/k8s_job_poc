@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Redis Queue Monitor</title>
+    <script>
+        var ws = new WebSocket("ws://localhost:8080/ws");
+
+        ws.onopen = function(event) {
+            console.log("WebSocket is open now.");
+        };
+
+        ws.onerror = function(event) {
+            console.error("WebSocket error observed:", event);
+        };
+
+        ws.onclose = function(event) {
+            console.log("WebSocket is closed now.");
+        };
+        
+        ws.onmessage = function(event) {
+            var msg = event.data;
+            var list = document.createElement("li");
+            list.appendChild(document.createTextNode(msg));
+            document.getElementById("messages").appendChild(list);
+        };
+    </script>
+</head>
+<body>
+    <h1>Redis Queue Monitor</h1>
+    <ul id="messages"></ul>
+</body>
+</html>
