@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"os"
 	"text/template"
 
 	"github.com/gorilla/websocket"
@@ -23,8 +24,14 @@ var (
 )
 
 func main() {
+	redisAddr, ok := os.LookupEnv("REDIS_ADDR")
+
+	if !ok {
+		redisAddr = "127.0.0.1:6379"
+	}
+
 	client = redis.NewClient(&redis.Options{
-		Addr:     "127.0.0.1:6379",
+		Addr:     redisAddr,
 		Password: "",
 		DB:       0,
 	})

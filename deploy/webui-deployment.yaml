@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webui
+  namespace: redis-namespace
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: webui
+  template:
+    metadata:
+      labels:
+        app: webui
+    spec:
+      containers:
+      - name: webui
+        image: localhost:5000/k8s_job_webui:latest
+        ports:
+        - containerPort: 8080
+        env:
+        - name: REDIS_ADDR
+          value: redis:6379

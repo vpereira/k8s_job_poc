@@ -1,0 +1,22 @@
+# Start from the official Golang image
+FROM golang:1.19-alpine
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy the Go module files and download dependencies
+COPY go.mod go.sum ./
+COPY webui/main.go ./
+COPY webui/index.html ./
+RUN go mod download
+
+# Copy the rest of the application source code
+COPY . .
+
+# Build the Go application
+RUN go build -o /webui main.go
+
+EXPOSE 8080
+
+# Set the command to run the application
+CMD ["/webui"]
